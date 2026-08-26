@@ -1,6 +1,6 @@
 import * as cheerio from 'cheerio';
 import { TMDB } from 'tmdb-ts';
-const tmdb = new TMDB(useRuntimeConfig().tmdbApiKey);
+const tmdb = new TMDB(process.env.NITRO_TMDB_API_KEY || process.env.TMDB_API_KEY || '');
 
 export default defineCachedEventHandler(async (event) => {
   try {
