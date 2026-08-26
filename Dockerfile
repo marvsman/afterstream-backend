@@ -11,7 +11,7 @@ RUN apk add --no-cache curl
 
 COPY . .
 
-RUN npx prisma generate
+RUN DATABASE_URL=postgresql://afterstream:build-only@127.0.0.1:5432/afterstream npx prisma generate
 
 RUN npm run build
 
