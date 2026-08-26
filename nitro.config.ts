@@ -27,8 +27,8 @@ export default defineNitroConfig({
         captchaClientKey: process.env.CAPTCHA_CLIENT_KEY || '',
       },
     },
-    cryptoSecret: process.env.CRYPTO_SECRET,
-    tmdbApiKey: process.env.TMDB_API_KEY,
+    cryptoSecret: process.env.CRYPTO_SECRET || '',
+    tmdbApiKey: process.env.TMDB_API_KEY || '',
     trakt: {
       clientId: process.env.TRAKT_CLIENT_ID,
       clientSecret: process.env.TRAKT_SECRET_ID,
