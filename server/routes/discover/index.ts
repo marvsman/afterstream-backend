@@ -33,81 +33,86 @@ export default defineCachedEventHandler(
       ),
     };
     let lists = [];
+    let trending = [];
+    let mostWatched = [];
+    let lastWeekend = [];
 
-    const internalLists = {
-      trending: await trakt.lists.trending(),
-      popular: await trakt.lists.popular(),
-    };
+    // Trakt is optional. Keep the TMDB-backed discovery response working when
+    // Trakt credentials are intentionally omitted.
+    if (trakt) {
+      const internalLists = {
+        trending: await trakt.lists.trending(),
+        popular: await trakt.lists.popular(),
+      };
 
-    for (let list = 0; list < internalLists.trending.length; list++) {
-      const items = await trakt.lists.items({
-        id: internalLists.trending[list].list.ids.trakt,
-        type: 'all',
-      });
-      lists.push({
-        name: internalLists.trending[list].list.name,
-        likes: internalLists.trending[list].like_count,
-        items: [],
-      });
-      for (let item = 0; item < items.length; item++) {
-        switch (true) {
-          case !!items[item].movie?.ids?.tmdb:
-            lists[list].items.push({
-              type: 'movie',
-              name: items[item].movie.title,
-              id: items[item].movie.ids.tmdb,
-              year: items[item].movie.year,
-            });
-            break;
-          case !!items[item].show?.ids?.tmdb:
-            lists[list].items.push({
-              type: 'show',
-              name: items[item].show.title,
-              id: items[item].show.ids.tmdb,
-              year: items[item].show.year,
-            });
-            break;
+      for (let list = 0; list < internalLists.trending.length; list++) {
+        const items = await trakt.lists.items({
+          id: internalLists.trending[list].list.ids.trakt,
+          type: 'all',
+        });
+        lists.push({
+          name: internalLists.trending[list].list.name,
+          likes: internalLists.trending[list].like_count,
+          items: [],
+        });
+        for (let item = 0; item < items.length; item++) {
+          switch (true) {
+            case !!items[item].movie?.ids?.tmdb:
+              lists[list].items.push({
+                type: 'movie',
+                name: items[item].movie.title,
+                id: items[item].movie.ids.tmdb,
+                year: items[item].movie.year,
+              });
+              break;
+            case !!items[item].show?.ids?.tmdb:
+              lists[list].items.push({
+                type: 'show',
+                name: items[item].show.title,
+                id: items[item].show.ids.tmdb,
+                year: items[item].show.year,
+              });
+              break;
+          }
         }
       }
-    }
 
-    for (let list = 0; list < internalLists.popular.length; list++) {
-      const items = await trakt.lists.items({
-        id: internalLists.popular[list].list.ids.trakt,
-        type: 'all',
-      });
-      lists.push({
-        name: internalLists.popular[list].list.name,
-        likes: internalLists.popular[list].like_count,
-        items: [],
-      });
-      for (let item = 0; item < items.length; item++) {
-        switch (true) {
-          case !!items[item].movie?.ids?.tmdb:
-            lists[lists.length - 1].items.push({
-              type: 'movie',
-              name: items[item].movie.title,
-              id: items[item].movie.ids.tmdb,
-              year: items[item].movie.year,
-            });
-            break;
-          case !!items[item].show?.ids?.tmdb:
-            lists[lists.length - 1].items.push({
-              type: 'show',
-              name: items[item].show.title,
-              id: items[item].show.ids.tmdb,
-              year: items[item].show.year,
-            });
-            break;
+      for (let list = 0; list < internalLists.popular.length; list++) {
+        const items = await trakt.lists.items({
+          id: internalLists.popular[list].list.ids.trakt,
+          type: 'all',
+        });
+        lists.push({
+          name: internalLists.popular[list].list.name,
+          likes: internalLists.popular[list].like_count,
+          items: [],
+        });
+        for (let item = 0; item < items.length; item++) {
+          switch (true) {
+            case !!items[item].movie?.ids?.tmdb:
+              lists[lists.length - 1].items.push({
+                type: 'movie',
+                name: items[item].movie.title,
+                id: items[item].movie.ids.tmdb,
+                year: items[item].movie.year,
+              });
+              break;
+            case !!items[item].show?.ids?.tmdb:
+              lists[lists.length - 1].items.push({
+                type: 'show',
+                name: items[item].show.title,
+                id: items[item].show.ids.tmdb,
+                year: items[item].show.year,
+              });
+              break;
+          }
         }
       }
-    }
-    const trending = await trakt.movies.popular();
 
-    // most watched films
-    const mostWatched = await trakt.movies.watched();
-    // takes the highest grossing box office film in the last weekend
-    const lastWeekend = await trakt.movies.boxoffice();
+      trending = await trakt.movies.popular();
+      mostWatched = await trakt.movies.watched();
+      lastWeekend = await trakt.movies.boxoffice();
+    }
 
     return {
       mostWatched,
